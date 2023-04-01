@@ -157,7 +157,7 @@ proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;**
 - Restartovati Nginx proces da bi prihvatio novu konfiguraciju:
 
 ```bash
-**********************************************systemctl restart nginx**********************************************
+systemctl restart nginx
 ```
 
 - To je bila sistemska komanda za pravi reset procesa koja se preporucuje, a postoji i Nginx komanda za reset master workera bez gasenja servera
@@ -171,9 +171,9 @@ proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;**
 # Firewall setup
 
 - Postavljamo firewall da bi dozvolili pristup serveru na samo 3 porta:
-    - **`80** (HTTP)`
-    - **`443** (HTTPS)`
-    - **`22** (SSH)`
+    - `80 (HTTP)`
+    - `443 (HTTPS)`
+    - `22 (SSH)`
 - Koristicemo Ubuntu-ov firewall: ******`ufw`******
 
 ```bash
