@@ -14,8 +14,8 @@
 - Treba uraditi update-ovati Linux sistem sa komandama:
 
 ```bash
-**apt-get update
-apt-get upgrade**
+apt-get update
+apt-get upgrade
 ```
 
 # Setup NodeJS i Git
@@ -24,13 +24,13 @@ apt-get upgrade**
 - Izlogujes se i ponovo ulogujes i proveris verziju nodea:
 
 ```bash
-**************node -v**************
+node -v
 ```
 
 - Setupujes ssh kljuc za git da mozes da povuces repo
     
     ```bash
-    **ssh-keygen -t rsa**
+    ssh-keygen -t rsa
     ```
     
     - lupis sve entere
@@ -44,13 +44,13 @@ apt-get upgrade**
 - **`node app.js`** i program ce raditi na serveru
 - Program u tom trenutku radi na portu 5000 / ili koji god da si uneo (treba kasnije port forwardovati sa reverse proxy-jem sa 80 ili 443 na 5000)
 
-> *Ne bi bilo lose dodati “`**app.set('trust proxy', 1);**`” u app.js
-i “`**proxy: true**`” kod kreiranja bilo kog cookie-a na backendu*
+> *Ne bi bilo lose dodati “app.set('trust proxy', 1);” u app.js
+i “proxy: true” kod kreiranja bilo kog cookie-a na backendu*
 > 
 
 # Process managing sa pm2 package-om
 
-- Treba menage-ovati proces, ne mozes samo pokrenuti **********************node app.js********************** jer to ima gomilu mana i nesigurnosti (npr svaki put kad pukne program ili se resetuje masina servera onda moras da se logujes na ssh da ga ozivis rucno)
+- Treba menage-ovati proces, ne mozes samo pokrenuti **node app.js** jer to ima gomilu mana i nesigurnosti (npr svaki put kad pukne program ili se resetuje masina servera onda moras da se logujes na ssh da ga ozivis rucno)
 - Opis paketa sa npm sajta: *“PM2 is a production process manager for Node.js applications with a built-in load balancer. It allows you to keep applications alive forever, to reload them without downtime and to facilitate common system admin tasks.”*
 - ChatGPT: ***“using a process manager like pm2 is highly recommended for running Node.js applications in production. Pm2 helps to manage your Node.js processes and ensure they run reliably, without being killed or crashing.”***
 - Neke od osnovnih komandi:
@@ -66,20 +66,20 @@ i “`**proxy: true**`” kod kreiranja bilo kog cookie-a na backendu*
 - Instaliraj paket globalno:
 
 ```bash
- ************npm install -g pm2************
+npm install -g pm2
 ```
 
 - Kreiraj proces sa imenom ***“api”*** i pokreni ga:
 
 ```bash
-**pm2 start app.js -n api**
+pm2 start app.js -n api
 ```
 
 - Server sada konstantno radi i ako nodejs program crashuje, pm2 ce probati da ga pokrene 15 puta u toku jedne sekunde dok ne odustane, ovo su generalno situacije koje svakako ne bi smele da se dogode
 - Krerati startup skriptu koja ce svaki put da pokrene proces kada se server reboot-uje / crash-uje
 
 ```bash
-**pm2 startup ubuntu**
+pm2 startup ubuntu
 ```
 
 # Reverse proxy sa Nginx
@@ -89,7 +89,7 @@ i “`**proxy: true**`” kod kreiranja bilo kog cookie-a na backendu*
 - Instaliraj Nginx:
 
 ```bash
-******************************************apt-get install nginx******************************************
+apt-get install nginx
 ```
 
 - Kada se instalira kreirace novi folder u koji se treba prebaciti
@@ -98,45 +98,45 @@ i “`**proxy: true**`” kod kreiranja bilo kog cookie-a na backendu*
 **cd ~/etc/nginx**
 ```
 
-- U njemu se nalaze svi nginx fajlovi, nama je najbitniji folder ************************************“`sites-available`”**
+- U njemu se nalaze svi nginx fajlovi, nama je najbitniji folder **"`sites-available`"**
 
 ```bash
-************cd sites-available************
+cd sites-available
 ```
 
 - U tom folderu se nalazi fajl koji se zove **“`default`”**. Njega treba editovati (preko nano-a) da bi se konfigurisao reverse proxy
 - U njemu postoji deo fajla:
 
 ```bash
-**server_name _;**
+server_name _;
 ```
 
 - Njega treba konfigurisati sa domain name-om bekenda i onda se dobije:
 
 ```bash
-****************************************************server_name [nekidomen.com](http://nekidomen.com) www.nekidomen.com;**
+server_name [nekidomen.com](http://nekidomen.com) www.nekidomen.com;
 ```
 
 - Obavezno ukljuciti verziju sa i bez www
-- Ispod toga u fajlu se nalazi **********************location********************** blok koji izgleda ovako:
+- Ispod toga u fajlu se nalazi **`location`** blok koji izgleda ovako:
 
 ```bash
-**********************************************************location / {
+location / {
 	# Neki garbage
-}**********************************************************
+}
 ```
 
 - Obrisati sve sto se nalazi u tom bloku i dodati sledece konfiguracije:
 
 ```bash
-**location / {
+location / {
 	proxy_pass http://localhost:5000;
 	proxy_http_version 1.1;
 	proxy_set_header Upgrade $http_upgrade;
 	proxy_set_header Connection ‘upgrade’;
 	proxy_set_header Host $host;
 	proxy_cache_bypass $http_upgrade;
-}**
+}
 ```
 
 - Da bi rate limiter na node serveru radio moraju se na reverse proxy-ju setovati dodatni headeri kako bi node server znao da preko njih gleda ip adresu klijenta a ne da misli da ga reverse proxy bombarduje DDOS-om
@@ -177,10 +177,10 @@ proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;**
 - Koristicemo Ubuntu-ov firewall: ******`ufw`******
 
 ```bash
-**************************************************************************************************************ufw enable
+ufw enable
 ufw allow ssh
 ufw allow http
-ufw allow https**************************************************************************************************************
+ufw allow https
 ```
 
 - Sada vise ne mozemo pristupiti direktno sa porta 5000, samo sa porta 80 a onda ce reverse proxy to forwardovati na proces na portu 5000
@@ -210,24 +210,24 @@ ufw allow https*****************************************************************
 
 - Trenutno kada pristupimo url-u pise **“Not secure”**
 - Kada bi hteli da rucno ukucamo **“https://url”** server ne bi respondovao jer nema setupovan HTTPS
-- Za ovaj korak je ********************NEOPHODAN******************** domain name
+- Za ovaj korak je **NEOPHODAN** domain name
 - Koristicemo letsencrypt i certbot da generisemo besplatne SSL sertifikate
-- Instaliramo certbot pomocu **********snap********** package managera:
+- Instaliramo certbot pomocu **`snap`** package managera:
 
 ```bash
-**snap install --classic certbot**
+snap install --classic certbot
 ```
 
 - Dodamo instaliran program u path da bi mogao da se koristi kao komanda bilo gde u terminalu:
 
 ```bash
-**ln -s /snap/bin/certbot usr/bin/certbot**
+ln -s /snap/bin/certbot usr/bin/certbot
 ```
 
 - Hocemo da pokrenemo sledecu komandu da bi certbot prosao kroz config fajlove od Nginx-a i setupovao SSL port
 
 ```bash
-****************************certbot --nginx****************************
+certbot --nginx
 ```
 
 - Pitace nas da unesemo email adresu gde ce nam slati obavestenje svaki put kad bude automatski obnavljao SSL sertifikat
@@ -238,7 +238,7 @@ ufw allow https*****************************************************************
 - Poslednja komanda koja nam je potrebna, da bi testirali renewal SSL sertifikata sa certbotom:
 
 ```bash
-**certbot renew --dry-run**
+certbot renew --dry-run
 ```
 
 - Trebalo bi da svaki put 90 dana pred istek SSL sertifikata certbot kreira novi sertifikat, ova komanda malopre je bila samo da simulira tu obnovu da vidimo da li obnova radi kako treba
