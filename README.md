@@ -95,7 +95,7 @@ apt-get install nginx
 - Kada se instalira kreirace novi folder u koji se treba prebaciti
 
 ```bash
-**cd ~/etc/nginx**
+cd ~/etc/nginx
 ```
 
 - U njemu se nalaze svi nginx fajlovi, nama je najbitniji folder **"`sites-available`"**
@@ -142,16 +142,16 @@ location / {
 - Da bi rate limiter na node serveru radio moraju se na reverse proxy-ju setovati dodatni headeri kako bi node server znao da preko njih gleda ip adresu klijenta a ne da misli da ga reverse proxy bombarduje DDOS-om
 
 ```bash
-**proxy_set_header X-Real-IP $remote_addr;
-proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;**
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 ```
 
-- Na Node serveru treba dodati ovu liniju kako bi server znao da uzima ip adrese iz tih headera umesto da gleda odakle je stvarno zahtev dosao **`app.set('trust proxy', true);`**
+- Na Node serveru treba dodati ovu liniju kako bi server znao da uzima ip adrese iz tih headera umesto da gleda odakle je stvarno zahtev dosao `app.set('trust proxy', true);`
 - Sacuvati i izaci iz fajla
 - Pokrenuti komandu da proverimo da li je sve kako treba:
 
 ```bash
-**nginx -t**
+nginx -t
 ```
 
 - Restartovati Nginx proces da bi prihvatio novu konfiguraciju:
@@ -163,10 +163,10 @@ systemctl restart nginx
 - To je bila sistemska komanda za pravi reset procesa koja se preporucuje, a postoji i Nginx komanda za reset master workera bez gasenja servera
 
 ```bash
-**nginx -s reload**
+nginx -s reload
 ```
 
-- Sada bi trebalo da se bekendu moze pristupiti na “`**domen/api`”** umesto “`**domen/api:5000`"**
+- Sada bi trebalo da se bekendu moze pristupiti na “`domen/api`” umesto “`domen/api:5000`"
 
 # Firewall setup
 
@@ -174,7 +174,7 @@ systemctl restart nginx
     - `80 (HTTP)`
     - `443 (HTTPS)`
     - `22 (SSH)`
-- Koristicemo Ubuntu-ov firewall: ******`ufw`******
+- Koristicemo Ubuntu-ov firewall: `ufw`
 
 ```bash
 ufw enable
