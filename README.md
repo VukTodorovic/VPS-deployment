@@ -114,7 +114,7 @@ server_name _;
 - Njega treba konfigurisati sa domain name-om bekenda i onda se dobije:
 
 ```bash
-server_name [nekidomen.com](http://nekidomen.com) www.nekidomen.com;
+server_name nekidomen.com www.nekidomen.com;
 ```
 
 - Obavezno ukljuciti verziju sa i bez www
