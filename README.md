@@ -1,4 +1,4 @@
-# Linode deployment (NodeJS)
+# VPS deployment (NodeJS)
 
 > *********************************************Ovo bi trebalo vecinski da funkcionise za bilo koji drugi VPS*********************************************
 > 
@@ -13,7 +13,7 @@
 - Pristupis VPS-u iz temrinala preko ssh
 - Treba uraditi update-ovati Linux sistem sa komandama:
 
-```bash
+```shell
 apt-get update
 apt-get upgrade
 ```
@@ -23,7 +23,7 @@ apt-get upgrade
 - Instaliras npm i node
 - Izlogujes se i ponovo ulogujes i proveris verziju nodea:
 
-```bash
+```shell
 node -v
 ```
 
@@ -65,20 +65,20 @@ i “proxy: true” kod kreiranja bilo kog cookie-a na backendu*
     9. **`pm2 startup`**: This command generates and configures a startup script for pm2, so that your managed processes will automatically start when the server is rebooted.
 - Instaliraj paket globalno:
 
-```bash
+```shell
 npm install -g pm2
 ```
 
 - Kreiraj proces sa imenom ***“api”*** i pokreni ga:
 
-```bash
+```shell
 pm2 start app.js -n api
 ```
 
 - Server sada konstantno radi i ako nodejs program crashuje, pm2 ce probati da ga pokrene 15 puta u toku jedne sekunde dok ne odustane, ovo su generalno situacije koje svakako ne bi smele da se dogode
 - Krerati startup skriptu koja ce svaki put da pokrene proces kada se server reboot-uje / crash-uje
 
-```bash
+```shell
 pm2 startup ubuntu
 ```
 
@@ -88,39 +88,39 @@ pm2 startup ubuntu
 - Da bi reverse proxy radio nije potrebno imati domen, sve se moze setupovati sa ip adresom servera ali da bi kasnije mogli da setupujemo SSL (https) moramo imati domen za bekend
 - Instaliraj Nginx:
 
-```bash
+```shell
 apt-get install nginx
 ```
 
 - Kada se instalira kreirace novi folder u koji se treba prebaciti
 
-```bash
+```shell
 cd ~/etc/nginx
 ```
 
 - U njemu se nalaze svi nginx fajlovi, nama je najbitniji folder **"`sites-available`"**
 
-```bash
+```shell
 cd sites-available
 ```
 
 - U tom folderu se nalazi fajl koji se zove **“`default`”**. Njega treba editovati (preko nano-a) da bi se konfigurisao reverse proxy
 - U njemu postoji deo fajla:
 
-```bash
+```shell
 server_name _;
 ```
 
 - Njega treba konfigurisati sa domain name-om bekenda i onda se dobije:
 
-```bash
+```shell
 server_name nekidomen.com www.nekidomen.com;
 ```
 
 - Obavezno ukljuciti verziju sa i bez www
 - Ispod toga u fajlu se nalazi **`location`** blok koji izgleda ovako:
 
-```bash
+```shell
 location / {
 	# Neki garbage
 }
@@ -128,7 +128,7 @@ location / {
 
 - Obrisati sve sto se nalazi u tom bloku i dodati sledece konfiguracije:
 
-```bash
+```shell
 location / {
 	proxy_pass http://localhost:5000;
 	proxy_http_version 1.1;
@@ -141,7 +141,7 @@ location / {
 
 - Da bi rate limiter na node serveru radio moraju se na reverse proxy-ju setovati dodatni headeri kako bi node server znao da preko njih gleda ip adresu klijenta a ne da misli da ga reverse proxy bombarduje DDOS-om
 
-```bash
+```shell
 proxy_set_header X-Real-IP $remote_addr;
 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 ```
@@ -150,23 +150,29 @@ proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 - Sacuvati i izaci iz fajla
 - Pokrenuti komandu da proverimo da li je sve kako treba:
 
-```bash
+```shell
 nginx -t
 ```
 
 - Restartovati Nginx proces da bi prihvatio novu konfiguraciju:
 
-```bash
+```shell
 systemctl restart nginx
 ```
 
 - To je bila sistemska komanda za pravi reset procesa koja se preporucuje, a postoji i Nginx komanda za reset master workera bez gasenja servera
 
-```bash
+```shell
 nginx -s reload
 ```
 
 - Sada bi trebalo da se bekendu moze pristupiti na “`domen/api`” umesto “`domen/api:5000`"
+- Ako taj url vraca “Apache2 Default page” html stranicu to znaci da je upaljen apache server na VPS masini i treba ga ugasiti i zabraniti da se pali pri svakom narednom reboot-u servera
+- Komande za stopiranje i onemogucavanje apache servera
+```shell
+sudo systemctl stop apache2
+sudo systemctl disable apache2
+```
 
 # Firewall setup
 
@@ -176,7 +182,7 @@ nginx -s reload
     - `22 (SSH)`
 - Koristicemo Ubuntu-ov firewall: `ufw`
 
-```bash
+```shell
 ufw enable
 ufw allow ssh
 ufw allow http
@@ -212,21 +218,16 @@ ufw allow https
 - Kada bi hteli da rucno ukucamo **“https://url”** server ne bi respondovao jer nema setupovan HTTPS
 - Za ovaj korak je **NEOPHODAN** domain name
 - Koristicemo letsencrypt i certbot da generisemo besplatne SSL sertifikate
-- Instaliramo certbot pomocu **`snap`** package managera:
+- Instaliramo Certbot i Certbot plugin za Nginx:
 
-```bash
-snap install --classic certbot
-```
-
-- Dodamo instaliran program u path da bi mogao da se koristi kao komanda bilo gde u terminalu:
-
-```bash
-ln -s /snap/bin/certbot usr/bin/certbot
+```shell
+sudo apt-get install certbot
+sudo apt-get install python3-certbot-nginx
 ```
 
 - Hocemo da pokrenemo sledecu komandu da bi certbot prosao kroz config fajlove od Nginx-a i setupovao SSL port
 
-```bash
+```shell
 certbot --nginx
 ```
 
@@ -237,10 +238,11 @@ certbot --nginx
 - Sada bi trebalo da u browseru mozemo da pristupimo preko https, odnosno da pise da je secured
 - Poslednja komanda koja nam je potrebna, da bi testirali renewal SSL sertifikata sa certbotom:
 
-```bash
+```shell
 certbot renew --dry-run
 ```
 
 - Trebalo bi da svaki put 90 dana pred istek SSL sertifikata certbot kreira novi sertifikat, ova komanda malopre je bila samo da simulira tu obnovu da vidimo da li obnova radi kako treba
+- Mozda resetovati Nginx proces opet za svaki slucaj
 
 # Deployment proces zavrsen!!!
