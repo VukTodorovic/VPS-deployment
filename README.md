@@ -1,6 +1,6 @@
 # VPS deployment (NodeJS)
 
-> *********************************************Ovo bi trebalo vecinski da funkcionise za bilo koji drugi VPS*********************************************
+> *********************************************Ovo bi trebalo vecinski da funkcionise za bilo koji VPS*********************************************
 > 
 
 # Pocetak
