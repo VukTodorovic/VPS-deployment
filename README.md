@@ -146,6 +146,12 @@ proxy_set_header X-Real-IP $remote_addr;
 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 ```
 
+- Ako je potrebno da se na server rade uploadovi slika, potrebno je podesiti maksimalan payload size. Vazice za slucajeve koje odredjuje blok u kojem se nalazi (http/server/location...)
+
+```shell
+client_max_body_size 30M;
+```
+
 - Na Node serveru treba dodati ovu liniju kako bi server znao da uzima ip adrese iz tih headera umesto da gleda odakle je stvarno zahtev dosao `app.set('trust proxy', true);`
 - Sacuvati i izaci iz fajla
 - Pokrenuti komandu da proverimo da li je sve kako treba:
