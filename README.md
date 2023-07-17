@@ -5,7 +5,7 @@
 
 # Pocetak
 
-- Napravis nalog na linode
+- Napravis nalog na nekom provideru
 - Zakupis VPS masinu sa odredjenim specifikacijama
 - Izaberes Ubuntu LTS kao operativni sistem
 - Postavis sifru za VPS
@@ -197,26 +197,10 @@ ufw allow https
 
 - Sada vise ne mozemo pristupiti direktno sa porta 5000, samo sa porta 80 a onda ce reverse proxy to forwardovati na proces na portu 5000
 
-# Setupovanje domain name-a
+# Setupovanje DNS-a
 
-- U Linode odemo u Domains
-- Create Domain
-- Unesemo ime domena koji smo negde zakupili: [nekidomen.com](http://nekidomen.com) (bez www)
-- Unesemo email adresu povezanu sa domainom
-- U Insert Default Records izaberemo Insert default records from one of my Linodes
-- Izaberemo nas Linode (VPS na koji deployujemo)
-- Kliknemo Create Domain
-- Sada cemo videti imena svih name servera:
-    - ns1.linode.com
-    - ns2.linode.com
-    - ns3.linode.com
-    - ns4.linode.com
-    - ns5.linode.com
-- Odemo na sajt gde smo zakupili domain (GoDaddy ili NameCheap)
-- U polju za podesavanje nameservera izaberemo Custom DNS
-- Dodamo svih 5 linode name servera
-- Ovo podesavanje moze da traje i do 48 sati da se zapravo izvrsi
-- Sada smo povezali nas Linode VPS na taj domain name
+- Dodati ili modifikovati A record da pokazuje na IP adresu sajta sa osnovnog domena **“example.com”**
+- Dodati CNAME record za www prefiks
 
 # Setupovanje SSL-a i HTTPS-a
 
