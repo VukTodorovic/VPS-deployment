@@ -20,7 +20,7 @@ apt-get upgrade
 
 # Setup NodeJS i Git
 
-- Instaliras npm i node
+- Instaliras npm i node (najlakse koristeci NVM)
 - Izlogujes se i ponovo ulogujes i proveris verziju nodea:
 
 ```shell
